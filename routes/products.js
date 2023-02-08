@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   }
 });
 router.post("/", isAdmin, async (req, res) => {
-  const { name, brand, desc, price, qty, image } = req.body;
+  const { name, brand, desc, price, qty, image, categoryId } = req.body;
   try {
     if (image) {
       const uploadRes = await cloudinary.uploader.upload(image, {
@@ -27,6 +27,7 @@ router.post("/", isAdmin, async (req, res) => {
           price,
           qty,
           image: uploadRes,
+          categoryId,
         });
         const saveProduct = await product.save();
         res.status(200).send(saveProduct);
