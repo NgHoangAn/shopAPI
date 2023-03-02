@@ -8,6 +8,7 @@ const products = require("./routes/products");
 const stripe = require("./routes/stripe");
 const orders = require("./routes/orders");
 const category = require("./routes/categoy");
+const province = require("./utils/dataProvince");
 const app = express();
 const bodyParser = require("body-parser");
 const compression = require("compression");
@@ -26,6 +27,9 @@ app.use("/api/stripe", stripe);
 app.use("/api/orders", orders);
 app.use("/api/category", category);
 
+app.get("/api/province", (req, res) => {
+  res.send(province);
+});
 app.get("/", (req, res) => {
   res.send("Hello");
 });

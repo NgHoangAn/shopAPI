@@ -1,6 +1,6 @@
 const { isAdmin, auth } = require("../middleware/auth");
 const { Order } = require("../models/orders");
-
+const { Product } = require("../models/products");
 const router = require("express").Router();
 
 router.get("/", async (req, res) => {
@@ -12,6 +12,39 @@ router.get("/", async (req, res) => {
     res.status(200).send(order);
   } catch (err) {
     res.status(500).send(err);
+  }
+});
+
+router.post("/", auth, async (req, res) => {
+  const newOrder = new Order({
+    userId: req.body.auth._id,
+    products: req.body.cartItem,
+    subtotal: req.body.cartTotalAmount,
+  });
+  try {
+    const savedOrder = await newOrder.save();
+    if (savedOrder) {
+      let array = [];
+      let temp;
+      req.body.cartItem.map((item) => array.push(item));
+      for (let i = 0; i < array.length; i++) {
+        temp = await Product.findById(array[i]._id);
+        let newQty = temp.qty - array[i].quantity;
+        const updatedProduct = await Product.findByIdAndUpdate(
+          array[i]._id,
+          {
+            $set: {
+              qty: newQty,
+            },
+          },
+          { new: true }
+        );
+      }
+      res.status(200).send("success");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("fail");
   }
 });
 router.get("/findOne/:id", auth, async (req, res) => {
